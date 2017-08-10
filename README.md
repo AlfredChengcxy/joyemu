@@ -6,7 +6,7 @@ It works by reading events from HID input devices and emulating the pins of DB9 
 
 I've tested this code with two PS3 Sixaxis controllers (both in wired USB and Bluetooth mode) and an XBOX 360 wireless controller (via the USB adapter). The mouse support has been tested with a Microsoft 3600 Bluetooth Mouse and a wired SteelSeries Sensei Raw.
 
-Any USB and Bluetooth HID devices are supported, as long as they present a Linux event device that is presented as `/dev/input/event[0-9]+`.
+Any USB and Bluetooth HID devices are supported, as long as they present a Linux event device that can be accessed as `/dev/input/event[0-9]+`.
 
 
 
@@ -45,10 +45,10 @@ Any other I/O board (or built-in GPIOs with level conversion) would probably wor
 
 Bits on the MCP23017 GPIO registers are connected to DB9 ports as follows:
 
-|  | up | down | left | right | fire1 | fire2 |
+| Connector | up | down | left | right | fire1 | fire2 |
 | --- | --- | --- | --- | --- | --- |
-| DB9 pin | 1 | 2 | 3 | 4 | 6 | 9 |
-| GPIO bit | 0 | 1 | 2 | 3 | 5 | 5 |
+| DB9 1/2 | 1 | 2 | 3 | 4 | 6 | 9 |
+| GPIOA/GPIOB | 0 | 1 | 2 | 3 | 5 | 5 |
 
 Bits 6 and 7 on GPIOA and GPIOB are unused.
 
