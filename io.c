@@ -115,11 +115,12 @@ int mcp_write_gpio(uint8_t bank, uint8_t data)
 unsigned char mcp_read_gpio(uint8_t bank) {
   uint8_t gpio;
   read_i2c(0x12+bank, &gpio);
+  return gpio;
 }
 
 
 // write the joystick port pin states to the GPIO pins
-int mcp_update_port_state(uint16_t port1_pins, uint16_t port2_pins) {
+void mcp_update_port_state(uint16_t port1_pins, uint16_t port2_pins) {
   uint8_t p=0;
 
   if (last_port1 != port1_pins) {
@@ -149,7 +150,8 @@ int mcp_initialize(uint8_t bus, uint16_t addr) // i2c bus number
 
   // open the I2C device  
   snprintf((char*)&dev, 511, "/dev/i2c-%d", bus);
-  if (i2c_dev=open_i2c(dev, addr)) {
+  i2c_dev=open_i2c(dev, addr);
+  if (i2c_dev) {
 
     // reset IOCON to set BANK=0. if already 0, the write goes to GPINTENB and has no effect
     write_i2c(0x05, 0x00);

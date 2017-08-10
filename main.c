@@ -33,8 +33,11 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 #include "defaults.h"
 #include "input.h"
+#include "io.h"
 #include "logging.h"
 #include "ports.h"
 
@@ -48,13 +51,14 @@ pthread_t port_io, event_poll;
 
 // user configurable stuff
 int config_log_verbosity=LOGLEVEL_INFO;
-uint8_t config_joystick_port=2;
-uint8_t config_mouse_port=1;
+int config_joystick_port=2;
+int config_mouse_port=1;
 float config_mouse_speed=1.3;
-
+int config_mouse_device=-1;
+int config_joystick1_device=-1, config_joystick2_device=-1;
 
 int main(int argc, char **argv) {
-  int i, rc, opt;
+  int rc, opt;
   static const char *options="i:a:d:m:j:vqh";
 
   // read command line arguments and set configuration variables accordingly
@@ -74,26 +78,46 @@ int main(int argc, char **argv) {
       case 'i':
       sscanf(optarg, "%d", &config_i2c_bus);
       if (config_i2c_bus<0) {
-        fprintf(stderr, "Invalid I2C bus number - please enter a positive integer number, eg. 1\n");
+        debug_log(LOGLEVEL_ERROR, "Invalid I2C bus number - please enter a positive integer number, eg. 1");
         exit(EXIT_FAILURE);
       }        
       break;
       
       case 'a':
-      sscanf(optarg, "0x%02x", &config_i2c_base);
+      if (strlen(optarg)==0 || strlen(optarg)<4 || optarg[0]!='0') {
+        debug_log(LOGLEVEL_ERROR, "Invalid I2C base address - please enter a hexadeximal number between 0x00 and 0xff");
+        exit(EXIT_FAILURE);
+      }        
+      sscanf(optarg, "0x%x", &config_i2c_base);
       if (config_i2c_base<0 || config_i2c_base>0xff) {
-        fprintf(stderr, "Invalid I2C base address - please enter a hexadeximal number between 0x00 and 0xff\n");
+        debug_log(LOGLEVEL_ERROR, "Invalid I2C base address - please enter a hexadeximal number between 0x00 and 0xff");
         exit(EXIT_FAILURE);
       }        
       break;
       
       case 'd':
+      if (strlen(optarg)==0 || strlen(optarg)<3 || (optarg[0]!='j' && optarg[0]!='m')) {
+        debug_log(LOGLEVEL_ERROR, "Invalid port assignment - please enter 'j1:', 'j2:' or 'm:' followed by the event device number, eg. 'j1:0'");
+        exit(EXIT_FAILURE);
+      }
+      if (optarg[0]=='m') {
+        sscanf(optarg, "m:%d", &config_mouse_device);
+        input_set_mouse_device(config_mouse_device);
+      } else {
+        if (optarg[1]=='1') {
+          sscanf(optarg, "j1:%d", &config_joystick1_device);
+          input_set_joystick1_device(config_joystick1_device);
+        } else {
+          sscanf(optarg, "j2:%d", &config_joystick2_device);
+          input_set_joystick2_device(config_joystick2_device);
+        }
+      }
       break;
       
       case 'm':
       sscanf(optarg, "%d", &config_mouse_port);
       if (config_mouse_port!=1 && config_mouse_port!=2) {
-        fprintf(stderr, "Invalid mouse port - please enter either 1 or 2\n");
+        debug_log(LOGLEVEL_ERROR, "Invalid mouse port - please enter either 1 or 2");
         exit(EXIT_FAILURE);
       }        
       break;
@@ -101,7 +125,7 @@ int main(int argc, char **argv) {
       case 'j':
       sscanf(optarg, "%d", &config_joystick_port);
       if (config_joystick_port!=1 && config_joystick_port!=2) {
-        fprintf(stderr, "Invalid joystick port - please enter either 1 or 2\n");
+        debug_log(LOGLEVEL_ERROR, "Invalid joystick port - please enter either 1 or 2");
         exit(EXIT_FAILURE);
       }        
       break;
@@ -147,7 +171,7 @@ int main(int argc, char **argv) {
   } 
 
   // initialize the I/O expander and start the port I/O thread
-  mcp_initialize(MCP_I2C_BUS_NUMBER, MCP_I2C_BASE_ADDR);
+  mcp_initialize(config_i2c_bus, config_i2c_base);
   mouse_set_port(config_mouse_port);
   rc=pthread_create(&port_io, NULL, port_io_thread, (void *)NULL);
   if (rc) {

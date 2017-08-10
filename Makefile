@@ -1,5 +1,5 @@
 CC=gcc
-CCOPTS=-I /usr/include/libevdev-1.0
+CCOPTS=-I /usr/include/libevdev-1.0 -Wall
 LD=gcc
 LDOPTS=-l evdev -l pthread -l m
 

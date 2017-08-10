@@ -32,6 +32,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 
 #include "logging.h"
 
@@ -62,5 +63,5 @@ void debug_log(int level, const char *fmt, ...) {
   vsnprintf((char*)&fmtbuf, 1024, fmt, argptr);
   va_end(argptr);
 
-  fprintf(stderr, "[%10d.%010d] %c%c %s\n", t.tv_sec, t.tv_usec, p, p, fmtbuf);
+  fprintf(stderr, "[%10d.%010d] %c%c %s\n", (long)(t.tv_sec), (long)(t.tv_usec), p, p, fmtbuf);
 }

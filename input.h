@@ -42,6 +42,10 @@
 #define DPAD_TYPE_GENERIC	2
 #define DPAD_TYPE_SIXAXIS	3
 
+void input_set_mouse_device(int d);
+void input_set_joystick1_device(int d);
+void input_set_joystick2_device(int d);
+
 int input_joysticks_connected(void);
 int input_mouse_connected(void);
 

@@ -31,6 +31,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 #include "io.h"
 #include "logging.h"
 #include "ports.h"
@@ -132,8 +133,8 @@ void mouse_rotate_x_encoder(int8_t bits) {
   }
   mouse_x_encoder=e;
   mouse_x_quadrature=q;
-  *port_pins=*port_pins&0x01fd|((e&1)<<1); // write e&1 to joystick port 1 pin 2
-  *port_pins=*port_pins&0x01f7|((q&1)<<3); // write q&1 to joystick port 1 pin 4
+  *port_pins=(*port_pins&0x01fd)|((e&1)<<1); // write e&1 to joystick port 1 pin 2
+  *port_pins=(*port_pins&0x01f7)|((q&1)<<3); // write q&1 to joystick port 1 pin 4
 }
 
 
@@ -151,8 +152,8 @@ void mouse_rotate_y_encoder(int8_t bits) {
   }
   mouse_y_encoder=e;
   mouse_y_quadrature=q;  
-  *port_pins=*port_pins&0x01fe|(e&1); // write e&1 to joystick port 1 pin 1
-  *port_pins=*port_pins&0x01fb|((q&1)<<2); // write q&1 to joystick port 1 pin 3
+  *port_pins=(*port_pins&0x01fe)|(e&1); // write e&1 to joystick port 1 pin 1
+  *port_pins=(*port_pins&0x01fb)|((q&1)<<2); // write q&1 to joystick port 1 pin 3
 }
 
 
@@ -175,7 +176,7 @@ void mouse_move(int axis, int distance) {
 void mouse_set_lmb(int state) {
   uint16_t *port_pins=(mouse_on_port==2) ? &port2_pins : &port1_pins;
   debug_log(LOGLEVEL_VERBOSE, "Mouse left button %s", state ? "down" : "up");
-  *port_pins=*port_pins&0x01df|(((!state)&1)<<5); // write state&1 to joystick port 1 pin 6
+  *port_pins=(*port_pins&0x01df)|(((!state)&1)<<5); // write state&1 to joystick port 1 pin 6
 }
 
 
@@ -183,7 +184,7 @@ void mouse_set_lmb(int state) {
 void mouse_set_rmb(int state) {
   uint16_t *port_pins=(mouse_on_port==2) ? &port2_pins : &port1_pins;
   debug_log(LOGLEVEL_VERBOSE, "Mouse right button %s", state ? "down" : "up");
-  *port_pins=*port_pins&0x00ff|(((!state)&1)<<8); // write state&1 to joystick port 1 pin 9
+  *port_pins=(*port_pins&0x00ff)|(((!state)&1)<<8); // write state&1 to joystick port 1 pin 9
 }
 
 

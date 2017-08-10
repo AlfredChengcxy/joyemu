@@ -34,6 +34,7 @@
 #include <libevdev/libevdev.h>
 #include <libevdev/libevdev-uinput.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/ioctl.h>
@@ -59,6 +60,8 @@
 #define DPAD_TYPE_SIXAXIS	3
 
 
+// event device numbers set on command line
+int mouse_devno=-1, joy1_devno=-1, joy2_devno=-1;
 
 // number of gamepads found, boolean for mouse found
 int gamepads_found=0, mouse_found=0;
@@ -66,6 +69,12 @@ int gamepads_found=0, mouse_found=0;
 // linux evdev structs for assigned devices
 struct libevdev *dev_joysticks[MAX_JOYSTICKS]={NULL, NULL};
 struct libevdev *dev_mouse = NULL;
+
+
+// designate a particular event device number for a device
+void input_set_mouse_device(int d) { mouse_devno=d; }
+void input_set_joystick1_device(int d) { joy1_devno=d; }
+void input_set_joystick2_device(int d) { joy2_devno=d; }
 
 
 // return the number of joysticks connected
@@ -84,7 +93,7 @@ int input_mouse_connected(void) {
 // depending on event types and codes, a device may be accepted either as
 // a gamepad/joystick or a mouse. 
 int input_scan_devices(int mouse_to_port, int first_joystick) {
-  int fd, rc, i;
+  int fd, rc, i, devno;
   glob_t glob_result;
   struct libevdev *dev = NULL;
   int attach_to_port=(first_joystick-1)%MAX_JOYSTICKS;
@@ -94,7 +103,8 @@ int input_scan_devices(int mouse_to_port, int first_joystick) {
     // ok, what did we find?
     int i=0;
     for(i=0;i<glob_result.gl_pathc;i++) {
-      debug_log(LOGLEVEL_DEBUG, "Checking device %s", glob_result.gl_pathv[i]);
+      sscanf(glob_result.gl_pathv[i], "/dev/input/event%d", &devno);
+      debug_log(LOGLEVEL_DEBUG, "Checking device %s, number %d", glob_result.gl_pathv[i], devno);
 
       fd = open(glob_result.gl_pathv[i], O_RDONLY|O_NONBLOCK);
       rc = libevdev_new_from_fd(fd, &dev);
@@ -170,10 +180,12 @@ int input_scan_devices(int mouse_to_port, int first_joystick) {
           if (has_dpad && has_fire) {
             // device is very likely a gamepad
             if (gamepads_found < MAX_JOYSTICKS) {
-              dev_joysticks[attach_to_port]=dev;
-              debug_log(LOGLEVEL_DEBUG, "Device has enough capabilities to emulate an Amiga joystick, assigning it to port %d", attach_to_port+1);
-              gamepads_found++;
-              attach_to_port=(attach_to_port+1)%MAX_JOYSTICKS;
+              if ( (gamepads_found==0) ? (joy1_devno==-1 || joy1_devno==devno) : (joy2_devno==-1 || joy2_devno==devno) ) {
+                dev_joysticks[attach_to_port]=dev;
+                debug_log(LOGLEVEL_DEBUG, "Device has enough capabilities to emulate an Amiga joystick, assigning it to port %d", attach_to_port+1);
+                gamepads_found++;
+                attach_to_port=(attach_to_port+1)%MAX_JOYSTICKS;
+              }
             }
           } else {
               debug_log(LOGLEVEL_DEBUG, "Doesn't look like a gamepad either");            
@@ -181,9 +193,13 @@ int input_scan_devices(int mouse_to_port, int first_joystick) {
         } else {
           // device is most probably a mouse
           if (!mouse_found) {
-            mouse_found=1;
-            dev_mouse=dev;
-            debug_log(LOGLEVEL_DEBUG, "Device is most probably a mouse, assigning it to port %d", mouse_to_port);
+            if (mouse_devno==-1 || mouse_devno==devno) {
+              mouse_found=1;
+              dev_mouse=dev;
+              debug_log(LOGLEVEL_DEBUG, "Device is most probably a mouse, assigning it to port %d", mouse_to_port);
+            } else {
+              debug_log(LOGLEVEL_DEBUG, "Device %d appears to be a mouse but use designated device number %d", devno, mouse_devno);
+            }
           }
         }
       }
