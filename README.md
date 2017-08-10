@@ -48,7 +48,7 @@ GPIO lines on the MCP23017 are connected to DB9 pins as follows:
 |Connector|up|down|left|right|fire1|fire2|
 |---|---|---|---|---|---|---|
 |DB9 1/2|1|2|3|4|6|9|
-|GPIOA/GPIOB|0|1|2|3|5|
+|GPIOA/GPIOB|0|1|2|3|4|5|
 
 Bits 6 and 7 on GPIOA and GPIOB are unused.
 
