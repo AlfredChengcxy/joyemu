@@ -33,13 +33,13 @@ Usage: joyemu [-vqh] [-i i2c_bus] [-a i2c_addr] [-d (j1|j2|m):evdev_nr] [-m mous
 	-h	display this help
 ```
 
-Note that if you log very verbosely to the console, the response - especially that of the mouse - may begin to lag behind the inputs. Only use the more verbose debugging levels for actual debugging.
+Note that if you log very verbosely to the console, the response to the inputs - especially that of the mouse - may begin to lag noticeably. Only use the more verbose debugging levels for actual debugging.
 
 
 
 ### Hardware
 
-I've developing this on a Raspberry Pi Zero W and an IO Pi Zero expander board from [AB Electronics](https://www.abelectronics.co.uk). The reason I'm using a separate I/O expander is that the Atari-style DB9 joystick ports are generally active-low, so the pins on the computer end are pulled up to +5V. On a Commodore 64 the pull-ups are internal to the CIA chips, whereas on an Amiga A500 or A1200 an inline resistor pack is used. The GPIO pins on the Raspberry Pi are **not** safe for +5V so they cannot be used unless an external level conversion is added.
+I've developing this on a Raspberry Pi Zero W and an IO Pi Zero expander board from [AB Electronics](https://www.abelectronics.co.uk). The reason I'm using a separate I/O expander is that the Atari-style DB9 joystick ports are active-low, so the pins on the computer end have pull-up resistors to +5V. On a Commodore C64 the pull-ups are internal to the CIA chips, whereas on an Amiga A500 or A1200 an inline resistor pack is used. The GPIO pins on the Raspberry Pi are **not** safe for +5V so they cannot be used unless external level conversion is used.
 
 Any other I/O board (or built-in GPIOs with level conversion) would probably work equally well, as long as it sends 0V..+5V and tolerates the +5V pull-ups. Of course, you'd also have to rewrite `io.c` and `io.h` accordingly.
 

@@ -104,14 +104,14 @@ int input_scan_devices(int mouse_to_port, int first_joystick) {
     int i=0;
     for(i=0;i<glob_result.gl_pathc;i++) {
       sscanf(glob_result.gl_pathv[i], "/dev/input/event%d", &devno);
-      debug_log(LOGLEVEL_DEBUG, "Checking device %s, number %d", glob_result.gl_pathv[i], devno);
+      debug_log(LOGLEVEL_VERBOSE, "Checking device %s, number %d", glob_result.gl_pathv[i], devno);
 
       fd = open(glob_result.gl_pathv[i], O_RDONLY|O_NONBLOCK);
       rc = libevdev_new_from_fd(fd, &dev);
       if (rc < 0) {
         debug_log(LOGLEVEL_ERROR, "Failed to init libevdev (%s)", strerror(-rc));
       } else {
-        debug_log(LOGLEVEL_DEBUG, "Input device name: \"%s\"", libevdev_get_name(dev));
+        debug_log(LOGLEVEL_VERBOSE, "Input device name: \"%s\"", libevdev_get_name(dev));
         debug_log(LOGLEVEL_DEBUG, "Input device ID: bus %#x vendor %#x product %#x",
           libevdev_get_id_bustype(dev),
           libevdev_get_id_vendor(dev),
@@ -182,7 +182,7 @@ int input_scan_devices(int mouse_to_port, int first_joystick) {
             if (gamepads_found < MAX_JOYSTICKS) {
               if ( (gamepads_found==0) ? (joy1_devno==-1 || joy1_devno==devno) : (joy2_devno==-1 || joy2_devno==devno) ) {
                 dev_joysticks[attach_to_port]=dev;
-                debug_log(LOGLEVEL_DEBUG, "Device has enough capabilities to emulate an Amiga joystick, assigning it to port %d", attach_to_port+1);
+                debug_log(LOGLEVEL_VERBOSE, "Device has capabilities to function as a joystick, assigning it to port %d", attach_to_port+1);
                 gamepads_found++;
                 attach_to_port=(attach_to_port+1)%MAX_JOYSTICKS;
               }
@@ -196,7 +196,7 @@ int input_scan_devices(int mouse_to_port, int first_joystick) {
             if (mouse_devno==-1 || mouse_devno==devno) {
               mouse_found=1;
               dev_mouse=dev;
-              debug_log(LOGLEVEL_DEBUG, "Device is most probably a mouse, assigning it to port %d", mouse_to_port);
+              debug_log(LOGLEVEL_VERBOSE, "Device has capabilities to function as a mouse, assigning it to port %d", mouse_to_port);
             } else {
               debug_log(LOGLEVEL_DEBUG, "Device %d appears to be a mouse but use designated device number %d", devno, mouse_devno);
             }
@@ -208,12 +208,12 @@ int input_scan_devices(int mouse_to_port, int first_joystick) {
   } else return rc; // GLOB_NOSPACE, GLOB_ABORTED or GLOB_NOMATCH
   
   if (mouse_found) {
-    debug_log(LOGLEVEL_INFO, "Using \"%s\" to emulate Amiga mouse in port %d", libevdev_get_name(dev_mouse), mouse_to_port);
+    debug_log(LOGLEVEL_INFO, "Using \"%s\" to emulate a mouse in port %d", libevdev_get_name(dev_mouse), mouse_to_port);
   }
 
   for(i=0;i<MAX_JOYSTICKS;i++) {
     if (!dev_joysticks[i]) continue;
-    debug_log(LOGLEVEL_INFO, "Using \"%s\" to emulate Amiga joystick in port %d", libevdev_get_name(dev_joysticks[i]), i+1);
+    debug_log(LOGLEVEL_INFO, "Using \"%s\" to emulate a joystick in port %d", libevdev_get_name(dev_joysticks[i]), i+1);
   }  
   
   return 0;
