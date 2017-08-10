@@ -43,12 +43,12 @@ I've developing this on a Raspberry Pi Zero W and an IO Pi Zero expander board f
 
 Any other I/O board (or built-in GPIOs with level conversion) would probably work equally well, as long as it sends 0V..+5V and tolerates the +5V pull-ups. Of course, you'd also have to rewrite `io.c` and `io.h` accordingly.
 
-Bits on the MCP23017 GPIO registers are connected to DB9 ports as follows:
+GPIO lines on the MCP23017 are connected to DB9 pins as follows:
 
 |Connector|up|down|left|right|fire1|fire2|
-|---|---|---|---|---|---|
+|---|---|---|---|---|---|---|
 |DB9 1/2|1|2|3|4|6|9|
-|GPIOA/GPIOB|0|1|2|3|5|5|
+|GPIOA/GPIOB|0|1|2|3|5|
 
 Bits 6 and 7 on GPIOA and GPIOB are unused.
 
