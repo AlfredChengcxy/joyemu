@@ -295,7 +295,7 @@ void *input_poll_thread(void *params) {
             
             case BTN_DPAD_LEFT:
             case BTN_SIXAXIS_LEFT:
-            joystick_set_axis(i, PORT_AXIS_VERTICAL, PORT_AXIS_STATE_LEFT * ev.value);            
+            joystick_set_axis(i, PORT_AXIS_HORIZONTAL, PORT_AXIS_STATE_LEFT * ev.value);            
             break;
             
             // all face button types map to joystick button 1

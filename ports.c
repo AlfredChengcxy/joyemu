@@ -39,7 +39,7 @@
 
 uint8_t mouse_on_port=1;
 float mouse_speed=1.3;
-
+uint8_t mouse_emulation=MOUSE_TYPE_AMIGA;
 
 // bitmasks for mouse rotary encoder pulses and
 // quadrature pulses
@@ -119,6 +119,10 @@ void mouse_set_port(int port) {
 }
 
 
+void mouse_set_emulation(int type) {
+  mouse_emulation=type;
+}
+
 // rotate the horizintal encoder in the mouse for a number of bits (positive or negative)
 void mouse_rotate_x_encoder(int8_t bits) {
   uint32_t e, q;
@@ -133,8 +137,13 @@ void mouse_rotate_x_encoder(int8_t bits) {
   }
   mouse_x_encoder=e;
   mouse_x_quadrature=q;
-  *port_pins=(*port_pins&0x01fd)|((e&1)<<1); // write e&1 to joystick port 1 pin 2
-  *port_pins=(*port_pins&0x01f7)|((q&1)<<3); // write q&1 to joystick port 1 pin 4
+  if (mouse_emulation==MOUSE_TYPE_AMIGA) {
+    *port_pins=(*port_pins&0x01fd)|((e&1)<<1); // write e&1 to joystick port 1 pin 2
+    *port_pins=(*port_pins&0x01f7)|((q&1)<<3); // write q&1 to joystick port 1 pin 4
+  } else {
+    *port_pins=(*port_pins&0x01fd)|((e&1)<<1); // write e&1 to joystick port 1 pin 2  
+    *port_pins=(*port_pins&0x01fe)|(q&1);      // write q&1 to joystick port 1 pin 1
+  }
 }
 
 
@@ -152,8 +161,13 @@ void mouse_rotate_y_encoder(int8_t bits) {
   }
   mouse_y_encoder=e;
   mouse_y_quadrature=q;  
-  *port_pins=(*port_pins&0x01fe)|(e&1); // write e&1 to joystick port 1 pin 1
-  *port_pins=(*port_pins&0x01fb)|((q&1)<<2); // write q&1 to joystick port 1 pin 3
+  if (mouse_emulation==MOUSE_TYPE_AMIGA) {
+    *port_pins=(*port_pins&0x01fe)|(e&1); // write e&1 to joystick port 1 pin 1
+    *port_pins=(*port_pins&0x01fb)|((q&1)<<2); // write q&1 to joystick port 1 pin 3
+  } else {
+    *port_pins=(*port_pins&0x01fb)|((e&1)<<2); // write e&1 to joystick port 1 pin 3  
+    *port_pins=(*port_pins&0x01f7)|((q&1)<<3); // write q&1 to joystick port 1 pin 4
+  }
 }
 
 

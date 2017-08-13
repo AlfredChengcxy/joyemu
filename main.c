@@ -56,10 +56,11 @@ int config_mouse_port=1;
 float config_mouse_speed=1.3;
 int config_mouse_device=-1;
 int config_joystick1_device=-1, config_joystick2_device=-1;
+int config_mouse_emulation=MOUSE_TYPE_AMIGA;
 
 int main(int argc, char **argv) {
   int rc, opt;
-  static const char *options="i:a:d:m:j:vqh";
+  static const char *options="i:a:d:m:j:e:vqh";
 
   // read command line arguments and set configuration variables accordingly
   while (1) {
@@ -130,19 +131,28 @@ int main(int argc, char **argv) {
       }        
       break;
 
+      case 'e':
+      sscanf(optarg, "%d", &config_mouse_emulation);
+      if (config_mouse_emulation!=0 && config_mouse_emulation!=1) {
+        debug_log(LOGLEVEL_ERROR, "Invalid mouse emulation type - please enter either 0 for Amiga or 1 for Atari ST");
+        exit(EXIT_FAILURE);
+      }
+      break;
+
       case 'h':
       default:
-      fprintf(stderr, "Usage: %s [-vqh] [-i i2c_bus] [-a i2c_addr] [-d (j1|j2|m):evdev_nr] [-m mouse_port] [-j joystick_port]\n\n", argv[0]);
-      fprintf(stderr, "\t-v\tadd verbosity\n\
-\t-q\tadd quietness\n\
-\t-i n\tset I2C bus number for I/O expander (default: 1)\n\
-\t-a 0xnn\tset I2C address for I/O expander as a hexadecimal byte (default: 0x20)\n\
-\t-d j1:n\tset event device number for joystick 1\n\
-\t-d j2:n\tset event device number for joystick 2\n\
-\t-d m:n\tset event device number for mouse\n\
-\t-m n\tset mouse port: 1 (default) or 2\n\
-\t-j n\tset first joystick port: 1 or 2 (default)\n\
-\t-h\tdisplay this help\n");
+      fprintf(stderr, "Usage: %s [-vqh] [-i bus] [-a addr] [-d (j1|j2|m):evdev] [-m port] [-j port] [-e type]\n\n", argv[0]);
+      fprintf(stderr, "  -v\t\tadd verbosity\n\
+  -q\t\tadd quietness\n\
+  -i n\t\tset I2C bus number for I/O expander (default: 1)\n\
+  -a 0xnn\tset I2C address for I/O expander as a hexadecimal byte (default: 0x20)\n\
+  -d j1:n\tset event device number for joystick 1\n\
+  -d j2:n\tset event device number for joystick 2\n\
+  -d m:n\tset event device number for mouse\n\
+  -m n\t\tset mouse port: 1 (default) or 2\n\
+  -j n\t\tset first joystick port: 1 or 2 (default)\n\
+  -e n\t\tset mouse emulation type: 0=Amiga (default), 1=Atari ST\n\
+  -h\t\tdisplay this help\n\n");
       exit(EXIT_FAILURE);
       break;
       
@@ -173,6 +183,7 @@ int main(int argc, char **argv) {
   // initialize the I/O expander and start the port I/O thread
   mcp_initialize(config_i2c_bus, config_i2c_base);
   mouse_set_port(config_mouse_port);
+  mouse_set_emulation(config_mouse_emulation);
   rc=pthread_create(&port_io, NULL, port_io_thread, (void *)NULL);
   if (rc) {
     debug_log(LOGLEVEL_ERROR, "Failed to create port I/O thread - exiting\n");
