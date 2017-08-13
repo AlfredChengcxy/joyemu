@@ -19,18 +19,19 @@ For Raspbian users, install packages `libevdev-dev` and `libi2c-dev` to compile 
 ### Usage
 
 ```
-Usage: joyemu [-vqh] [-i i2c_bus] [-a i2c_addr] [-d (j1|j2|m):evdev_nr] [-m mouse_port] [-j joystick_port]
+Usage: ./joyemu [-vqh] [-i bus] [-a addr] [-d (j1|j2|m):evdev] [-m port] [-j port] [-e type]
 
-	-v	add verbosity
-	-q	add quietness
-	-i n	set I2C bus number for I/O expander (default: 1)
-	-a 0xnn	set I2C address for I/O expander as a hexadecimal byte (default: 0x20)
-	-d j1:n	set event device number for joystick 1
-	-d j2:n	set event device number for joystick 2
-	-d m:n	set event device number for mouse
-	-m n	set mouse port: 1 (default) or 2
-	-j n	set first joystick port: 1 or 2 (default)
-	-h	display this help
+  -v		add verbosity
+  -q		add quietness
+  -i n		set I2C bus number for I/O expander (default: 1)
+  -a 0xnn	set I2C address for I/O expander as a hexadecimal byte (default: 0x20)
+  -d j1:n	set event device number for joystick 1
+  -d j2:n	set event device number for joystick 2
+  -d m:n	set event device number for mouse
+  -m n		set mouse port: 1 (default) or 2
+  -j n		set first joystick port: 1 or 2 (default)
+  -e n		set mouse emulation type: 0=Amiga (default), 1=Atari ST
+  -h		display this help
 ```
 
 Note that if you log very verbosely to the console, the response to the inputs - especially that of the mouse - may begin to lag noticeably. Only use the more verbose debugging levels for actual debugging.
