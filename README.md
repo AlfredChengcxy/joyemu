@@ -8,6 +8,10 @@ I've tested this code with two PS3 Sixaxis controllers (both in wired USB and Bl
 
 Any USB and Bluetooth HID devices are supported, as long as they present a Linux event device that can be accessed as `/dev/input/event[0-9]+`.
 
+A more in-depth article on the project including some photos of the hardware can be found here:
+
+https://haxor.fi/using-wireless-bluetooth-gamepads-and-mice-on-an-amiga-or-c64/
+
 
 
 ### Compiling
@@ -59,7 +63,7 @@ I've added a 2x8 pin header on the I/O board and built a cable that connects the
 
 ### License
  
-Copyright (c) Jani Halme 2017
+Copyright (c) 2017 Jani Halme
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
