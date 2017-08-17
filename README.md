@@ -44,9 +44,9 @@ Note that if you log very verbosely to the console, the response to the inputs -
 
 ### Hardware
 
-I've developing this on a Raspberry Pi Zero W and an IO Pi Zero expander board from [AB Electronics](https://www.abelectronics.co.uk). The reason I'm using a separate I/O expander is that the Atari-style DB9 joystick ports are active-low, so the pins on the computer end have pull-up resistors to +5V. On a Commodore C64 the pull-ups are internal to the CIA chips, whereas on an Amiga A500 or A1200 an inline resistor pack is used. The GPIO pins on the Raspberry Pi are **not** safe for +5V so they cannot be used unless external level conversion is used.
+I'm developing this on a Raspberry Pi Zero W and an IO Pi Zero expander board from [AB Electronics](https://www.abelectronics.co.uk). The reason I'm using a separate I/O expander is that the Atari-style DB9 joystick ports are active-low, so the pins on the computer end have pull-up resistors to +5V. On a Commodore C64 the pull-ups are internal to the CIA chips, whereas on an Amiga A500 or A1200 use external 4.7Ω resistors. The GPIO pins on the Raspberry Pi are **not** safe for +5V so they cannot be used unless external level conversion is used.
 
-Any other I/O board (or built-in GPIOs with level conversion) would probably work equally well, as long as it sends 0V..+5V and tolerates the +5V pull-ups. Of course, you'd also have to rewrite `io.c` and `io.h` accordingly.
+Any other I/O board (or built-in GPIOs with level conversion) would probably work equally well, as long as it sends 0V..+5V and tolerates the +5V pull-ups. Of course, you'd also have to rewrite `io.c` and `io.h` accordingly to support the hardware.
 
 GPIO lines on the MCP23017 are connected to DB9 pins as follows:
 
